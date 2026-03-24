@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="AUTOFY - High-velocity analytical infrastructure for the modern data enterprise"/>
+<title>AUTOFY // TERMINAL_ACCESS_v2.0.4</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23000' width='100' height='100'/><text y='.9em' font-size='90' fill='%23FFEB00'>▸</text></svg>" type="image/svg+xml"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          "background": "#000000",
+          "surface": "#050505",
+          "primary": "#FFEB00",
+          "on-surface": "#FFFFFF",
+          "outline": "#222222",
+          "accent-dim": "#002208"
+        },
+        fontFamily: {
+          "mono": ["JetBrains Mono", "monospace"],
+        },
+        animation: {
+          'dash': 'dash 2s linear infinite',
+        },
+        keyframes: {
+          dash: {
+            '0%': { strokeDashoffset: '0' },
+            '100%': { strokeDashoffset: '20' },
+          }
+        }
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer base {
+    body {
+      @apply bg-background text-on-surface font-mono selection:bg-primary selection:text-black;
+    }
+  }
+  .brutalist-card {
+    @apply border border-outline bg-black relative;
+    box-shadow: 6px 6px 0px 0px #111;
+    transition: all 0.2s ease;
+  }
+  .brutalist-card:hover {
+    box-shadow: 6px 6px 0px 0px #FFEB00;
+    @apply border-primary/50;
+  }
+  .data-grid {
+    background-image: radial-gradient(#222 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .scanline {
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 255, 65, 0.02) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+  }
+  .glitch-hover:hover {
+    text-shadow: 2px 0 #FFEB00, -2px 0 #fff;
+  }
+  .nav-link {
+    @apply relative;
+  }
+  .nav-link::after {
+    content: '';
+    @apply absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300;
+  }
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+  @media (max-width: 768px) {
+    .nav-desktop { display: none; }
+  }
+  @media (min-width: 769px) {
+    .nav-mobile-btn { display: none; }
+  }
+</style>
+</head>
+<body class="data-grid min-h-screen">
+<div class="fixed inset-0 scanline z-[100]"></div>
+
+<nav class="fixed top-0 w-full z-50 bg-black border-b border-outline backdrop-blur-sm">
+  <div class="flex justify-between items-center px-4 h-12">
+    <div class="flex items-center gap-4">
+      <div class="bg-primary text-black px-2 py-0.5 text-xs font-extrabold tracking-tighter cursor-pointer" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        AUTOFY_OS
+      </div>
+      <div class="text-[10px] text-zinc-500 hidden sm:block">
+        Uptime: 99.9997% | Latency: 0.04ms | Build: 2.0.4-STABLE
+      </div>
+    </div>
+
+    <div class="flex items-center gap-6 text-[10px] uppercase font-bold tracking-widest nav-desktop">
+      <a class="nav-link text-primary glitch-hover" href="#kernel">[01.KERNEL]</a>
+      <a class="nav-link hover:text-primary transition-colors" href="#nodes">[02.NODES]</a>
+      <a class="nav-link hover:text-primary transition-colors" href="#metrics">[03.METRICS]</a>
+      <button class="bg-white text-black px-3 py-1 hover:bg-primary transition-all">INITIALIZE_SESSION</button>
+    </div>
+
+    <button class="nav-mobile-btn text-primary" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+      <span class="material-symbols-outlined text-2xl" id="menuIcon">menu</span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu hidden fixed inset-0 bg-black/95 z-40 flex-col items-center justify-center gap-8" id="mobileMenu">
+  <button class="absolute top-3 right-4 text-primary" onclick="toggleMobileMenu()" aria-label="Close menu">
+    <span class="material-symbols-outlined text-3xl">close</span>
+  </button>
+  <div class="flex flex-col items-center gap-6 text-lg font-bold tracking-widest">
+    <a class="text-primary" href="#kernel" onclick="toggleMobileMenu()">[01.KERNEL]</a>
+    <a class="text-white hover:text-primary" href="#nodes" onclick="toggleMobileMenu()">[02.NODES]</a>
+    <a class="text-white hover:text-primary" href="#metrics" onclick="toggleMobileMenu()">[03.METRICS]</a>
+    <button class="bg-primary text-black px-6 py-2 mt-4" onclick="toggleMobileMenu()">INITIALIZE_SESSION</button>
+  </div>
+</div>
+
+<main class="pt-12">
+  <section class="border-b border-outline px-4 py-20 relative overflow-hidden" id="kernel">
+    <div class="absolute right-0 top-0 w-1/3 h-full opacity-10 pointer-events-none hidden md:block">
+      <pre class="text-[8px] leading-none text-primary select-none">01100101 01111000 01100101
+01100011 01110101 01110100
+01100101 00101110 01100001
+01101110 01100001 01101100
+01111001 01111010 01100101
+00101110 01101111 01110000
+01110100 01101001 01101101
+01101001 01111010 01100101</pre>
+    </div>
+    <div class="max-w-screen-2xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+      <div class="space-y-8">
+        <div class="inline-flex items-center gap-2 border border-primary/30 px-2 py-1 bg-accent-dim/10">
+          <span class="w-2 h-2 bg-primary animate-pulse rounded-full"></span>
+          <span class="text-[10px] font-bold text-primary uppercase">System Status: Maximum Operational Control</span>
+        </div>
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.85] tracking-tighter">
+          EXECUTE.<br/>
+          ANALYZE.<br/>
+          <span class="text-primary italic">OPTIMIZE.</span>
+        </h1>
+        <div class="max-w-xl space-y-6">
+          <p class="text-sm md:text-base text-zinc-400 leading-relaxed uppercase border-l-2 border-primary pl-4">
+            Direct operational control for analytical power users. Raw performance metrics delivered via proprietary recursive engine. Zero abstraction layer. Optimized for 100% throughput efficiency.
+          </p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-outline">
+            <div>
+              <div class="text-[10px] text-zinc-500">THROUGHPUT</div>
+              <div class="text-sm font-bold">14.2 GB/S</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-zinc-500">LATENCY</div>
+              <div class="text-sm font-bold text-primary">0.002 MS</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-zinc-500">ACTIVE_NODES</div>
+              <div class="text-sm font-bold">4,102</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-zinc-500">PACKET_LOSS</div>
+              <div class="text-sm font-bold">0.000%</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-4">
+            <button class="bg-primary text-black px-8 py-4 text-xs font-black uppercase hover:bg-white transition-all shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-none active:translate-x-1 active:translate-y-1">
+              Launch_Recursive_Protocol
+            </button>
+            <button class="border border-white text-white px-8 py-4 text-xs font-black uppercase hover:bg-primary hover:text-black transition-all">
+              view_system_logs
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="brutalist-card p-4 aspect-video flex flex-col overflow-hidden">
+        <div class="flex justify-between items-center mb-4 border-b border-outline pb-2 text-[10px]">
+          <span class="text-zinc-500">SCHEMATIC_V.04 // REAL_TIME_FLOW</span>
+          <span class="text-primary animate-pulse flex items-center gap-1">
+            <span class="w-2 h-2 bg-primary rounded-full"></span>
+            LIVE_FEED
+          </span>
+        </div>
+        <div class="flex-1 relative flex items-center justify-center">
+          <svg class="w-full h-full opacity-40" viewBox="0 0 400 200">
+            <defs>
+              <pattern height="10" id="smallGrid" patternUnits="userSpaceOnUse" width="10">
+                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#222" stroke-width="0.5"></path>
+              </pattern>
+            </defs>
+            <rect fill="url(#smallGrid)" height="100%" width="100%"></rect>
+            <path class="animate-dash" d="M50,100 Q100,20 200,100 T350,100" fill="none" stroke="#FFEB00" stroke-dasharray="5,5" stroke-width="1"></path>
+            <circle cx="50" cy="100" fill="#FFEB00" r="3"></circle>
+            <circle cx="200" cy="100" fill="#FFEB00" r="3"></circle>
+            <circle cx="350" cy="100" fill="#FFEB00" r="3"></circle>
+            <rect fill="black" height="40" stroke="#FFEB00" stroke-width="1" width="40" x="180" y="80"></rect>
+          </svg>
+          <div class="absolute top-0 left-0 w-full h-full p-4 font-mono text-[9px] text-primary/60 pointer-events-none">
+            <p>0x44A1 >> NODE_SYNC_SUCCESS</p>
+            <p>0x44A2 >> ALLOCATING_BUFFERS...</p>
+            <p>0x44A3 >> RECURSION_DEPTH=64</p>
+          </div>
+        </div>
+        <div class="mt-4 grid grid-cols-3 gap-2 h-1 bg-outline">
+          <div class="bg-primary w-full"></div>
+          <div class="bg-primary w-2/3"></div>
+          <div class="bg-primary w-1/2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="border-b border-outline bg-black py-3 overflow-hidden whitespace-nowrap">
+    <div class="flex gap-12 text-[10px] font-black uppercase tracking-[0.4em] opacity-40">
+      <span>Core_Process_Active</span>
+      <span class="text-primary">Luma.Systems // 100% Sync</span>
+      <span>Data_Ingestion_Node_A</span>
+      <span class="text-primary">Nexus_Dynamics // 100% Sync</span>
+      <span>Core_Process_Active</span>
+      <span class="text-primary">Apex_Logic // 100% Sync</span>
+      <span>Data_Ingestion_Node_B</span>
+    </div>
+  </div>
+
+  <section class="px-4 py-24" id="nodes">
+    <div class="max-w-screen-2xl mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
+        <div>
+          <h2 class="text-4xl font-black mb-2 tracking-tighter">TECHNICAL_REPORTS</h2>
+          <p class="text-[10px] text-zinc-500 tracking-[0.2em] uppercase">Detailed performance documentation for mission critical deployment.</p>
+        </div>
+        <div class="text-[10px] font-bold text-primary flex gap-4 flex-wrap">
+          <span>[ TOTAL_TASKS: 1,482,029 ]</span>
+          <span>[ SUCCESS_RATE: 99.98% ]</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="brutalist-card p-6 group cursor-pointer">
+          <div class="mb-12 flex justify-between">
+            <span class="material-symbols-outlined text-4xl text-primary">analytics</span>
+            <span class="text-[10px] text-zinc-500">ID: 001</span>
+          </div>
+          <h3 class="text-lg font-black mb-4 group-hover:text-primary transition-colors">01_LOGIC_MESH</h3>
+          <p class="text-xs text-zinc-500 leading-relaxed uppercase">Recursive automation mapping. Deployment of nested logic structures for multidimensional data processing.</p>
+          <div class="mt-8 pt-4 border-t border-outline flex items-center justify-between">
+            <span class="text-[10px] font-bold">READY</span>
+            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+        <div class="brutalist-card p-6 group cursor-pointer border-primary/20">
+          <div class="mb-12 flex justify-between">
+            <span class="material-symbols-outlined text-4xl text-white">memory</span>
+            <span class="text-[10px] text-zinc-500">ID: 002</span>
+          </div>
+          <h3 class="text-lg font-black mb-4 group-hover:text-primary transition-colors">02_CLUSTER_OS</h3>
+          <p class="text-xs text-zinc-500 leading-relaxed uppercase">Dynamic node scaling. Real-time allocation of virtualized CPU cores based on immediate demand metrics.</p>
+          <div class="mt-8 pt-4 border-t border-outline flex items-center justify-between">
+            <span class="text-[10px] font-bold">ACTIVE</span>
+            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+        <div class="brutalist-card p-6 group cursor-pointer">
+          <div class="mb-12 flex justify-between">
+            <span class="material-symbols-outlined text-4xl text-primary">data_object</span>
+            <span class="text-[10px] text-zinc-500">ID: 003</span>
+          </div>
+          <h3 class="text-lg font-black mb-4 group-hover:text-primary transition-colors">03_RAW_TELEMETRY</h3>
+          <p class="text-xs text-zinc-500 leading-relaxed uppercase">Sub-millisecond data ingestion. Direct pipe from edge nodes to core analytical engine without buffering.</p>
+          <div class="mt-8 pt-4 border-t border-outline flex items-center justify-between">
+            <span class="text-[10px] font-bold">READY</span>
+            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+        <div class="brutalist-card p-6 group cursor-pointer">
+          <div class="mb-12 flex justify-between">
+            <span class="material-symbols-outlined text-4xl text-white">security</span>
+            <span class="text-[10px] text-zinc-500">ID: 004</span>
+          </div>
+          <h3 class="text-lg font-black mb-4 group-hover:text-primary transition-colors">04_HARDEN_CORE</h3>
+          <p class="text-xs text-zinc-500 leading-relaxed uppercase">Zero-trust architecture. SHA-256 verification for every transaction across the distributed network.</p>
+          <div class="mt-8 pt-4 border-t border-outline flex items-center justify-between">
+            <span class="text-[10px] font-bold">ACTIVE</span>
+            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-surface border-y border-outline py-24 px-4" id="metrics">
+    <div class="max-w-screen-2xl mx-auto grid lg:grid-cols-2 gap-16 items-start">
+      <div class="space-y-12">
+        <h2 class="text-4xl md:text-5xl font-black leading-none uppercase">CORE_KERNEL_V4.<br/><span class="text-primary">ARCHITECTURE</span></h2>
+        <div class="space-y-8">
+          <div class="flex gap-6">
+            <span class="text-2xl font-black text-primary">A.</span>
+            <div>
+              <h4 class="font-bold uppercase mb-2">Multi-Threaded Output</h4>
+              <p class="text-sm text-zinc-400 uppercase leading-relaxed">Direct hardware mapping enables 24k threads per instance. Optimized for high-frequency trading and heavy data manipulation.</p>
+            </div>
+          </div>
+          <div class="flex gap-6">
+            <span class="text-2xl font-black text-primary">B.</span>
+            <div>
+              <h4 class="font-bold uppercase mb-2">Recursive Feedback Loops</h4>
+              <p class="text-sm text-zinc-400 uppercase leading-relaxed">System self-optimizes based on prior execution cycles. Neural-derived logic patterns reduce overhead by 45%.</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-8 border-2 border-primary brutalist-card">
+          <div class="text-4xl font-black mb-4">99.999%</div>
+          <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">GUARANTEED_UPTIME_SLA</div>
+        </div>
+      </div>
+      <div class="brutalist-card bg-black p-4 font-mono text-xs text-zinc-300">
+        <div class="flex gap-2 mb-4">
+          <div class="w-3 h-3 rounded-full bg-zinc-800"></div>
+          <div class="w-3 h-3 rounded-full bg-zinc-800"></div>
+          <div class="w-3 h-3 rounded-full bg-zinc-800"></div>
+        </div>
+        <pre class="overflow-x-auto"><span class="text-primary"># MODULE: DATA_ORCHESTRATOR</span>
+class Kernel(Process):
+    def __init__(self, node_id):
+        self.node = node_id
+        self.state = "INIT"
+
+    async def execute(self, payload):
+        <span class="text-zinc-500"># Check node health</span>
+        if await self.verify_integrity():
+            self.state = "RUNNING"
+            results = await self.process_raw(payload)
+            return self.optimize_out(results)
+
+    def optimize_out(self, data):
+        <span class="text-primary"># Apply recursive refinement</span>
+        refined = [d * self.delta for d in data]
+        return refined
+
+<span class="text-primary"># INITIALIZING NODES [0..1024]</span>
+nodes = [Kernel(i) for i in range(1024)]
+asyncio.gather(*[n.execute(RAW_FEED) for n in nodes])</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 px-4">
+    <div class="max-w-screen-2xl mx-auto border-4 border-white p-8 md:p-24 relative overflow-hidden text-center group">
+      <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      <h2 class="text-4xl md:text-7xl lg:text-9xl font-black mb-8 leading-none tracking-tighter uppercase">SCALE_NOW.</h2>
+      <p class="max-w-2xl mx-auto text-sm md:text-base text-zinc-400 uppercase mb-12">
+        Join the top 0.1% of data engineers utilizing the most advanced autonomous infrastructure on the market.
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-6">
+        <button class="bg-primary text-black px-12 py-6 text-xl font-black uppercase hover:bg-white transition-all shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] hover:shadow-none active:translate-x-1 active:translate-y-1">
+          INITIALIZE_UPLINK
+        </button>
+        <button class="border-2 border-white text-white px-12 py-6 text-xl font-black uppercase hover:bg-primary hover:text-black transition-all">
+          VIEW_API_DOCS
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="bg-black border-t border-outline py-12 px-4" id="contact">
+  <div class="max-w-screen-2xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12">
+    <div class="col-span-2 md:col-span-1">
+      <div class="text-xl font-black text-primary mb-4 tracking-tighter cursor-pointer" onclick="window.scrollTo({top:0,behavior:'smooth'})">AUTOFY_SYSTEMS</div>
+      <p class="text-[10px] text-zinc-500 uppercase leading-relaxed">
+        High-velocity analytical infrastructure for the modern data enterprise. Built for raw performance.
+      </p>
+    </div>
+    <div class="flex flex-col gap-2">
+      <span class="text-[10px] font-black text-zinc-600 mb-2 underline">SYSTEM_DIR</span>
+      <a class="text-[10px] uppercase hover:text-primary transition-colors" href="#">[KRNL_DOCS.MD]</a>
+      <a class="text-[10px] uppercase hover:text-primary transition-colors" href="#">[NODE_STTS.LOG]</a>
+      <a class="text-[10px] uppercase hover:text-primary transition-colors" href="#">[SEC_PROTO.KEY]</a>
+    </div>
+    <div class="flex flex-col gap-2">
+      <span class="text-[10px] font-black text-zinc-600 mb-2 underline">NETWORK</span>
+      <a class="text-[10px] uppercase hover:text-primary transition-colors" href="https://github.com" target="_blank" rel="noopener">[GITHUB.REPO]</a>
+      <a class="text-[10px] uppercase hover:text-primary transition-colors" href="https://discord.com" target="_blank" rel="noopener">[DISCORD.COMM]</a>
+      <a class="text-[10px] uppercase hover:text-primary transition-colors" href="#">[SUPPORT.TICKET]</a>
+    </div>
+    <div class="flex flex-col gap-4">
+      <span class="text-[10px] font-black text-zinc-600 underline">UPLINK_SUB</span>
+      <form class="flex border border-outline bg-surface" onsubmit="handleSubscribe(event)">
+        <input class="bg-transparent border-none text-[10px] px-3 py-2 w-full focus:ring-0 uppercase placeholder:text-zinc-600" placeholder="USER@TERMINAL" type="email" required/>
+        <button class="bg-primary text-black px-3 hover:bg-white transition-colors" type="submit">
+          <span class="material-symbols-outlined text-sm">send</span>
+        </button>
+      </form>
+    </div>
+  </div>
+  <div class="max-w-screen-2xl mx-auto pt-12 mt-12 border-t border-outline flex flex-wrap justify-between items-center gap-4 text-[9px] text-zinc-600 uppercase">
+    <div>© 2026 AUTOFY_CORE // ALL_RIGHTS_ENCRYPTED</div>
+    <div class="flex gap-4">
+      <span class="text-primary">LATENCY_STABLE</span>
+      <span>BUILD_v2.0.4-LTS</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const icon = document.getElementById('menuIcon');
+    menu.classList.toggle('hidden');
+    if (menu.classList.contains('hidden')) {
+      icon.textContent = 'menu';
+      document.body.style.overflow = '';
+    } else {
+      icon.textContent = 'close';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function handleSubscribe(e) {
+    e.preventDefault();
+    const input = e.target.querySelector('input');
+    if (input.value) {
+      alert(`SUBSCRIBED: ${input.value}\n\nYou will receive updates from AUTOFY_CORE.`);
+      input.value = '';
+    }
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (window.scrollY > 50) {
+      nav.classList.add('bg-black/90');
+    } else {
+      nav.classList.remove('bg-black/90');
+    }
+  });
+</script>
+
+</body>
+</html>
